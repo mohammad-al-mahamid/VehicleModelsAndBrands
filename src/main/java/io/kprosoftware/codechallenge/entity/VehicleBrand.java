@@ -8,7 +8,7 @@ import io.kprosoftware.codechallenge.common.BaseEntity;
 import io.kprosoftware.codechallenge.enum_.PriceSegment;
 
 @Entity
-public class VehicleBrands extends BaseEntity<Long> {
+public class VehicleBrand extends BaseEntity<Long> {
 
     private String name;
     @Enumerated(EnumType.STRING)
@@ -30,7 +30,7 @@ public class VehicleBrands extends BaseEntity<Long> {
         this.priceSegment = priceSegment;
     }
 
-    public VehicleBrands(String name, PriceSegment priceSegment) {
+    public VehicleBrand(String name, PriceSegment priceSegment) {
 
         this.name = name;
         this.priceSegment = priceSegment;
