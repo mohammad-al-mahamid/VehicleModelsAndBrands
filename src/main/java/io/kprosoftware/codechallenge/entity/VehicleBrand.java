@@ -5,7 +5,11 @@ import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
+
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import io.kprosoftware.codechallenge.common.BaseEntity;
 import io.kprosoftware.codechallenge.enum_.PriceSegment;
@@ -16,7 +20,8 @@ public class VehicleBrand extends BaseEntity<Long> {
     private String name;
     @Enumerated(EnumType.STRING)
     private PriceSegment priceSegment;
-    @OneToMany(mappedBy = "vehicleBrand")
+    @OneToMany(mappedBy = "vehicleBrand", fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Model> models;
 
     public VehicleBrand() {

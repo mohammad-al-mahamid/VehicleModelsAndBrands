@@ -1,14 +1,17 @@
 package io.kprosoftware.codechallenge.service;
 
 import java.util.List;
-import java.util.Optional;
-
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import io.kprosoftware.codechallenge.entity.Model;
 import io.kprosoftware.codechallenge.entity.VehicleBrand;
-import io.kprosoftware.codechallenge.exception.VehicleBrandNotFoundExceptionException;
+import io.kprosoftware.codechallenge.exception.VehicleBrandNotFoundException;
+import io.kprosoftware.codechallenge.repository.ModelRepository;
 import io.kprosoftware.codechallenge.repository.VehicleBrandsRepository;
 
 @Service
@@ -18,71 +21,88 @@ public class VehicleBrandsService {
   @Autowired
   private VehicleBrandsRepository vehicleBrandsRepository;
 
+  @Autowired
+  private ModelRepository modelRepository;
+
   public VehicleBrandsService(Logger logger) {
     super();
     this.logger = logger;
   }
 
-  public List<VehicleBrand> getVehicleBrands() {
+  @Transactional
+  public ResponseEntity<List<VehicleBrand>> getVehicleBrands() {
     List<VehicleBrand> vehicleBrands = vehicleBrandsRepository.findAll();
     if (vehicleBrands.isEmpty()) {
       logger.info("List is Empty");
+      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
     logger.info("Get a list of VehicleBrands ");
-    return vehicleBrands;
+    return new ResponseEntity<>(vehicleBrands, HttpStatus.OK);
   }
 
-  public VehicleBrand getVehicleBrandsById(Long id) {
-    Optional<VehicleBrand> result = vehicleBrandsRepository.findById(id);
+  @Transactional
+  public ResponseEntity<VehicleBrand> getVehicleBrandsById(Long id) {
+    VehicleBrand result = vehicleBrandsRepository.findById(id)
 
-    if (!result.isPresent()) {
-      logger.info("VehicleBrands Not Found");
+        .orElseThrow(() -> new VehicleBrandNotFoundException(id));
 
-    } else {
-      logger.info("VehicleBrands at " + id + "is" + result.get());
-      return result.get();
+    logger.info("VehicleBrands at " + id + " is " + result);
+    return new ResponseEntity<>(result, HttpStatus.OK);
+  }
+
+  public ResponseEntity<VehicleBrand> addVehicleBrand(VehicleBrand vehicleBrand) {
+    VehicleBrand newVehicleBrand = new VehicleBrand(vehicleBrand.getName(), vehicleBrand.getPriceSegment());
+    vehicleBrandsRepository.saveAndFlush(newVehicleBrand);
+
+    logger.info("Saved VehicleBrands with id" + newVehicleBrand.getId());
+    logger.info("VehicleBrands saved" + newVehicleBrand.toString());
+
+    // Save the new Model object, assuming that there is at least one Model in the
+    // list
+    if (vehicleBrand.getModels() != null && !vehicleBrand.getModels().isEmpty()) {
+      Model model = vehicleBrand.getModels().get(0);
+      model.setVehicleBrand(newVehicleBrand); // Associate the Model with the new VehicleBrand
+      model = modelRepository.saveAndFlush(model);
+      logger.info("Saved Model with id: " + model.getId() + " for VehicleBrand with id: " + newVehicleBrand.getId());
     }
-    return null;
+    return new ResponseEntity<>(newVehicleBrand, HttpStatus.CREATED);
   }
 
-  public VehicleBrand addVehicleBrand(VehicleBrand VehicleBrands) {
-    VehicleBrand newVehicleBrands = vehicleBrandsRepository.saveAndFlush(VehicleBrands);
-    logger.info("Saved VehicleBrands with id" + newVehicleBrands.getId());
-    logger.info("VehicleBrands saved" + newVehicleBrands.toString());
-    vehicleBrandsRepository.saveAndFlush(newVehicleBrands);
-    return newVehicleBrands;
-  }
-
-  public VehicleBrand UpdateVehicleBrand(VehicleBrand newVehicleBrands, Long id) {
+  @Transactional
+  public ResponseEntity<VehicleBrand> UpdateVehicleBrand(VehicleBrand newVehicleBrand, Long id) {
     return vehicleBrandsRepository.findById(id)
-        .map(VehicleBrands -> {
+        .map(vehicleBrands -> {
           logger.info("old VehicleBrands: " + vehicleBrandsRepository.findById(id).get());
-          VehicleBrands.setName(newVehicleBrands.getName());
-          VehicleBrands.setPriceSegment(newVehicleBrands.getPriceSegment());
 
-          logger.info("replace was successful: " + VehicleBrands.toString());
-          return vehicleBrandsRepository.save(VehicleBrands);
+          vehicleBrands.setName(newVehicleBrand.getName());
+          vehicleBrands.setPriceSegment(newVehicleBrand.getPriceSegment());
+
+          logger.info("replace was successful: " + vehicleBrands.toString());
+          return new ResponseEntity<>(vehicleBrandsRepository.save(vehicleBrands), HttpStatus.OK);
         })
-        .orElseThrow(() -> new VehicleBrandNotFoundExceptionException(id));
+        .orElseThrow(() -> new VehicleBrandNotFoundException(id));
   }
 
-  public void deleteVehicleBrandById(Long id) {
-    Optional<VehicleBrand> result = vehicleBrandsRepository.findById(id);
+  public ResponseEntity<HttpStatus> deleteVehicleBrandById(Long id) {
 
-    if (result.isPresent()) {
-      logger.warn("vehicleBrands with id" + id + " will be removed from the Database ");
-      vehicleBrandsRepository.deleteById(id);
-    } else {
-      throw new VehicleBrandNotFoundExceptionException(id);
+    if (!vehicleBrandsRepository.existsById(id)) {
+      logger.warn("vehicleBrand with id" + id + " will be removed from the Database ");
+      throw new VehicleBrandNotFoundException(id);
     }
+
+    vehicleBrandsRepository.deleteById(id);
+    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
   }
 
-  public void deleteALLVehicleBrands() {
+  public ResponseEntity<HttpStatus> deleteALLVehicleBrands() {
     List<VehicleBrand> result = vehicleBrandsRepository.findAll();
 
-    if (result.isEmpty())
-      throw new VehicleBrandNotFoundExceptionException();
-    logger.warn("Delete ALL VehicleBrands!!! ");
+    if (result.isEmpty()) {
+      throw new VehicleBrandNotFoundException();
+    }
+
+    logger.warn("Delete all VehicleBrands!!! ");
     vehicleBrandsRepository.deleteAll();
+    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
   }
 }

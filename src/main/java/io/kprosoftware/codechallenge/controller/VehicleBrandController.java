@@ -3,6 +3,8 @@ package io.kprosoftware.codechallenge.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,33 +22,34 @@ public class VehicleBrandController {
   private VehicleBrandsService vehicleBrandsService;
 
   @GetMapping("/VehicleBrands")
-  public List<VehicleBrand> getVehicleBrands() {
+  public ResponseEntity<List<VehicleBrand>> getVehicleBrands() {
     return vehicleBrandsService.getVehicleBrands();
   }
 
   @GetMapping("/VehicleBrands{id}")
-  public VehicleBrand getVehicleBrandById(@PathVariable Long id) {
+  public ResponseEntity<VehicleBrand> getVehicleBrandById(@PathVariable Long id) {
     return vehicleBrandsService.getVehicleBrandsById(id);
   }
 
   @PostMapping("/VehicleBrand")
-  public VehicleBrand addVehicleBrand(@RequestBody VehicleBrand vehicleBrand) {
+  public ResponseEntity<VehicleBrand> addVehicleBrand(@RequestBody VehicleBrand vehicleBrand) {
     return vehicleBrandsService.addVehicleBrand(vehicleBrand);
   }
 
   @PutMapping("/VehicleBrand/{id}")
-  public VehicleBrand UpdateVehicleBrand(@PathVariable Long id, @RequestBody VehicleBrand vehicleBrand) {
+  public ResponseEntity<VehicleBrand> UpdateVehicleBrand(@PathVariable Long id,
+      @RequestBody VehicleBrand vehicleBrand) {
     return vehicleBrandsService.UpdateVehicleBrand(vehicleBrand, id);
   }
 
   @DeleteMapping("/VehicleBrand/{id}")
-  public void deleteVehicleBrandById(@PathVariable Long id) {
-    vehicleBrandsService.deleteVehicleBrandById(id);
+  public ResponseEntity<HttpStatus> deleteVehicleBrandById(@PathVariable Long id) {
+    return vehicleBrandsService.deleteVehicleBrandById(id);
   }
 
   @DeleteMapping("/VehicleBrands")
-  public void deleteVehicleBrands() {
-    vehicleBrandsService.deleteALLVehicleBrands();
+  public ResponseEntity<HttpStatus> deleteVehicleBrands() {
+    return vehicleBrandsService.deleteALLVehicleBrands();
   }
 
 }
