@@ -1,6 +1,8 @@
 package io.kprosoftware.codechallenge.entity;
 
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 
 import io.kprosoftware.codechallenge.common.BaseEntity;
 import io.kprosoftware.codechallenge.enum_.PriceSegment;
@@ -9,6 +11,7 @@ import io.kprosoftware.codechallenge.enum_.PriceSegment;
 public class VehicleBrands extends BaseEntity<Long> {
 
     private String name;
+    @Enumerated(EnumType.STRING)
     private PriceSegment priceSegment;
 
     public String getName() {
