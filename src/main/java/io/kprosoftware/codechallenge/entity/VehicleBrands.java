@@ -34,4 +34,3 @@ public class VehicleBrands extends BaseEntity<Long> {
     }
 
 }
-
