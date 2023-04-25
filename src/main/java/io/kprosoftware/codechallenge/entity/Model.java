@@ -27,6 +27,12 @@ public class Model extends BaseEntity<Long> {
     super();
   }
 
+  public Model(String name, double enginePower, VehicleBrand vehicleBrand) {
+    this.name = name;
+    this.enginePower = enginePower;
+    this.vehicleBrand = vehicleBrand;
+  }
+
   public String getName() {
     return name;
   }
@@ -53,7 +59,7 @@ public class Model extends BaseEntity<Long> {
 
   @Override
   public String toString() {
-    return "Model [name=" + name + ", enginePower=" + enginePower + ", vehicleBrand=" + vehicleBrand + "]";
+    return "Model [name=" + name + ", enginePower=" + enginePower + "]";
   }
 
 }

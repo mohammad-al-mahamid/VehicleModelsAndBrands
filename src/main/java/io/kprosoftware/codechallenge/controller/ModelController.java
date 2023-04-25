@@ -3,6 +3,8 @@ package io.kprosoftware.codechallenge.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,32 +22,32 @@ public class ModelController {
   private ModelService modelService;
 
   @GetMapping("/Models")
-  public List<Model> getModels() {
+  public ResponseEntity<List<Model>> getModels() {
     return modelService.getModels();
   }
 
   @GetMapping("/Models{id}")
-  public Model getModelById(@PathVariable Long id) {
+  public ResponseEntity<Model> getModelById(@PathVariable Long id) {
     return modelService.getModelById(id);
   }
 
-  @PostMapping("/Model")
-  public Model addModel(@RequestBody Model Model) {
-    return modelService.addModel(Model);
+  @PostMapping("vehicleBrands/{vehicleBrandId}/model")
+  public ResponseEntity<Model> addModel(@PathVariable Long vehicleBrandId, @RequestBody Model Model) {
+    return modelService.addModel(vehicleBrandId, Model);
   }
 
   @PutMapping("/Model/{id}")
-  public Model UpdateModel(@PathVariable Long id, @RequestBody Model Model) {
+  public ResponseEntity<Model> UpdateModel(@PathVariable Long id, @RequestBody Model Model) {
     return modelService.UpdateModel(Model, id);
   }
 
   @DeleteMapping("/Model/{id}")
-  public void deleteModelById(@PathVariable Long id) {
-    modelService.deleteModelById(id);
+  public ResponseEntity<HttpStatus> deleteModelById(@PathVariable Long id) {
+    return modelService.deleteModelById(id);
   }
 
   @DeleteMapping("/Models")
-  public void deleteModels() {
-    modelService.deleteALLModels();
+  public ResponseEntity<HttpStatus> deleteModels() {
+    return modelService.deleteALLModels();
   }
 }

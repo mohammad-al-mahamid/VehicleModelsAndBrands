@@ -5,76 +5,108 @@ import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import io.kprosoftware.codechallenge.entity.Model;
-import io.kprosoftware.codechallenge.exception.ModelNotFoundExceptionException;
+import io.kprosoftware.codechallenge.entity.VehicleBrand;
+import io.kprosoftware.codechallenge.exception.ModelNotFoundException;
+import io.kprosoftware.codechallenge.exception.VehicleBrandNotFoundException;
 import io.kprosoftware.codechallenge.repository.ModelRepository;
+import io.kprosoftware.codechallenge.repository.VehicleBrandsRepository;
 
 @Service
 public class ModelService {
   private Logger logger;
   @Autowired
   private ModelRepository modelRepository;
+  @Autowired
+  private VehicleBrandsRepository vehicleBrandsRepository;
 
   public ModelService(Logger logger) {
     super();
     this.logger = logger;
   }
 
-  public List<Model> getModels() {
+  public ResponseEntity<List<Model>> getModels() {
     List<Model> models = modelRepository.findAll();
     if (models.isEmpty()) {
       logger.info("Model List is Empty");
+      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+
     }
     logger.info("Get a list of models");
-    return models;
+    return new ResponseEntity<>(models, HttpStatus.OK);
   }
 
-  public Model getModelById(Long id) {
-    Model result = modelRepository.findById(id).get();
+  public ResponseEntity<Model> getModelById(Long id) {
+    Model result = modelRepository.findById(id)
+        .orElseThrow(() -> new ModelNotFoundException(id));
 
-    return result;
+    logger.info("model with " + id + " is " + result);
+    return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
-  public Model addModel(Model Models) {
-    Model newModels = modelRepository.saveAndFlush(Models);
-    logger.info("Saved Models with id" + newModels.getId());
-    logger.info("Models saved" + newModels.toString());
-    modelRepository.saveAndFlush(newModels);
-    return newModels;
+  public ResponseEntity<Model> addModel(Long vehicleBrandId, Model model) {
+    VehicleBrand existingVehicleBrand = checkifVehicleBrandExist(vehicleBrandId);
+    Model newModel = new Model(model.getName(), model.getEnginePower(), existingVehicleBrand);
+
+    logger.info("Saved Models with id" + newModel.getId());
+    logger.info("Models saved" + newModel.toString());
+
+    modelRepository.saveAndFlush(newModel);
+
+    return new ResponseEntity<>(newModel, HttpStatus.CREATED);
   }
 
-  public Model UpdateModel(Model newModels, Long id) {
+  public ResponseEntity<Model> UpdateModel(Model newModel, Long id) {
     return modelRepository.findById(id)
         .map(model -> {
           logger.info("old Models: " + modelRepository.findById(id).get());
-          model.setName(newModels.getName());
-          model.setEnginePower(newModels.getEnginePower());
+          model.setName(newModel.getName());
+          model.setEnginePower(newModel.getEnginePower());
 
           logger.info("Update was successful: " + model.toString());
-          return modelRepository.save(model);
+
+          return new ResponseEntity<>(modelRepository.save(model), HttpStatus.OK);
         })
-        .orElseThrow(() -> new ModelNotFoundExceptionException(id));
+        .orElseThrow(() -> new ModelNotFoundException(id));
   }
 
-  public void deleteModelById(Long id) {
-    Optional<Model> result = modelRepository.findById(id);
-
-    if (result.isPresent()) {
-      logger.warn("Models with id" + id + " will be removed from the Database ");
-      modelRepository.deleteById(id);
-    } else {
-      throw new ModelNotFoundExceptionException(id);
+  public ResponseEntity<HttpStatus> deleteModelById(Long id) {
+    if (!modelRepository.existsById(id)) {
+      logger.warn("model with id" + id + " will be removed from the Database ");
+      throw new ModelNotFoundException(id);
     }
+
+    modelRepository.deleteById(id);
+    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
   }
 
-  public void deleteALLModels() {
+  public ResponseEntity<HttpStatus> deleteALLModels() {
     List<Model> result = modelRepository.findAll();
 
     if (result.isEmpty())
-      throw new ModelNotFoundExceptionException();
-    logger.warn("Delete ALL Models!!! ");
+      throw new ModelNotFoundException();
+    logger.warn("Delete all Models!!! ");
     modelRepository.deleteAll();
+
+    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+  }
+
+  private VehicleBrand checkifVehicleBrandExist(Long id) {
+    Optional<VehicleBrand> vehicleBrand = vehicleBrandsRepository.findById(id);
+
+    if (!vehicleBrandsRepository.existsById(id)) {
+      logger.warn("model with id" + id + " will be removed from the Database ");
+      throw new VehicleBrandNotFoundException(id);
+    }
+    // if (!vehicleBrand.isPresent()) {
+    // logger.error("could not found vehicleBrand with id " + id);
+    // throw new VehicleBrandNotFoundException(id);
+    // }
+    logger.info(" found vehicleBrand with id " + id);
+    return vehicleBrand.get();
   }
 }
