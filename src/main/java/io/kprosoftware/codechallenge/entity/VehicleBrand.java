@@ -1,8 +1,11 @@
 package io.kprosoftware.codechallenge.entity;
 
+import java.util.List;
+
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.OneToMany;
 
 import io.kprosoftware.codechallenge.common.BaseEntity;
 import io.kprosoftware.codechallenge.enum_.PriceSegment;
@@ -13,6 +16,8 @@ public class VehicleBrand extends BaseEntity<Long> {
     private String name;
     @Enumerated(EnumType.STRING)
     private PriceSegment priceSegment;
+    @OneToMany(mappedBy = "vehicleBrand")
+    private List<Model> models;
 
     public VehicleBrand() {
         super();
@@ -38,6 +43,23 @@ public class VehicleBrand extends BaseEntity<Long> {
 
         this.name = name;
         this.priceSegment = priceSegment;
+    }
+
+    public List<Model> getModels() {
+        return models;
+    }
+
+    public void setModels(List<Model> models) {
+        this.models = models;
+    }
+
+    public void addModel(Model model) {
+        models.add(model);
+    }
+
+    @Override
+    public String toString() {
+        return "VehicleBrand [name=" + name + ", priceSegment=" + priceSegment + ", models=" + models + "]";
     }
 
 }
