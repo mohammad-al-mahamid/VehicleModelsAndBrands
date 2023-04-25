@@ -28,6 +28,7 @@ public class VehicleBrandsService {
     if (vehicleBrands.isEmpty()) {
       logger.info("List is Empty");
     }
+    logger.info("Get a list of VehicleBrands ");
     return vehicleBrands;
   }
 
@@ -44,7 +45,7 @@ public class VehicleBrandsService {
     return null;
   }
 
-  public VehicleBrand addVehicleBrands(VehicleBrand VehicleBrands) {
+  public VehicleBrand addVehicleBrand(VehicleBrand VehicleBrands) {
     VehicleBrand newVehicleBrands = vehicleBrandsRepository.saveAndFlush(VehicleBrands);
     logger.info("Saved VehicleBrands with id" + newVehicleBrands.getId());
     logger.info("VehicleBrands saved" + newVehicleBrands.toString());
@@ -52,7 +53,7 @@ public class VehicleBrandsService {
     return newVehicleBrands;
   }
 
-  public VehicleBrand UpdateVehicleBrands(VehicleBrand newVehicleBrands, Long id) {
+  public VehicleBrand UpdateVehicleBrand(VehicleBrand newVehicleBrands, Long id) {
     return vehicleBrandsRepository.findById(id)
         .map(VehicleBrands -> {
           logger.info("old VehicleBrands: " + vehicleBrandsRepository.findById(id).get());
@@ -65,7 +66,7 @@ public class VehicleBrandsService {
         .orElseThrow(() -> new VehicleBrandNotFoundExceptionException(id));
   }
 
-  public void deleteVehicleBrandsById(Long id) {
+  public void deleteVehicleBrandById(Long id) {
     Optional<VehicleBrand> result = vehicleBrandsRepository.findById(id);
 
     if (result.isPresent()) {
