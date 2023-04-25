@@ -1,8 +1,14 @@
 package io.kprosoftware.codechallenge.entity;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import io.kprosoftware.codechallenge.common.BaseEntity;
 
@@ -11,8 +17,10 @@ public class Model extends BaseEntity<Long> {
 
   private String name;
   private double enginePower;
-  @ManyToOne
-  @JoinColumn(nullable = false)
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "vehicleBrand_id", nullable = false)
+  @OnDelete(action = OnDeleteAction.CASCADE)
+  @JsonIgnore
   private VehicleBrand vehicleBrand;
 
   public Model() {
