@@ -7,6 +7,6 @@ public class ModelNotFoundExceptionException extends RuntimeException {
   }
 
   public ModelNotFoundExceptionException(Long id) {
-    super("Can not Found model with Id: ");
+    super("Can not Found model with Id: " + id);
   }
 }
