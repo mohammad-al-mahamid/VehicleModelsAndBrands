@@ -14,6 +14,10 @@ public class VehicleBrand extends BaseEntity<Long> {
     @Enumerated(EnumType.STRING)
     private PriceSegment priceSegment;
 
+    public VehicleBrand() {
+        super();
+    }
+
     public String getName() {
         return name;
     }
