@@ -5,11 +5,13 @@ import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import io.kprosoftware.codechallenge.entity.Model;
 import io.kprosoftware.codechallenge.exception.ModelNotFoundExceptionException;
 import io.kprosoftware.codechallenge.repository.ModelRepository;
 
+@Service
 public class ModelService {
   private Logger logger;
   @Autowired
