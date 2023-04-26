@@ -48,6 +48,15 @@ public class ModelService {
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
+  public ResponseEntity<List<Model>> getAllModelsByvehicleBrandId(Long vehicleBrandId) {
+    if (!vehicleBrandsRepository.existsById(vehicleBrandId)) {
+      throw new VehicleBrandNotFoundException(vehicleBrandId);
+    }
+
+    List<Model> models = modelRepository.findByvehicleBrandId(vehicleBrandId);
+    return new ResponseEntity<>(models, HttpStatus.OK);
+  }
+
   public ResponseEntity<Model> addModel(Long vehicleBrandId, Model model) {
     VehicleBrand existingVehicleBrand = checkifVehicleBrandExist(vehicleBrandId);
     Model newModel = new Model(model.getName(), model.getEnginePower(), existingVehicleBrand);
@@ -102,10 +111,7 @@ public class ModelService {
       logger.warn("model with id" + id + " will be removed from the Database ");
       throw new VehicleBrandNotFoundException(id);
     }
-    // if (!vehicleBrand.isPresent()) {
-    // logger.error("could not found vehicleBrand with id " + id);
-    // throw new VehicleBrandNotFoundException(id);
-    // }
+
     logger.info(" found vehicleBrand with id " + id);
     return vehicleBrand.get();
   }

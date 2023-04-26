@@ -26,19 +26,26 @@ public class ModelController {
     return modelService.getModels();
   }
 
-  @GetMapping("/Models{id}")
+  @GetMapping("/Model{id}")
   public ResponseEntity<Model> getModelById(@PathVariable Long id) {
     return modelService.getModelById(id);
   }
 
+  @GetMapping("vehicleBrands/{vehicleBrandId}/model")
+  public ResponseEntity<List<Model>> getAllModelsByvehicleBrandId(
+      @PathVariable(value = "vehicleBrandId") Long vehicleBrandId) {
+
+    return modelService.getAllModelsByvehicleBrandId(vehicleBrandId);
+  }
+
   @PostMapping("vehicleBrands/{vehicleBrandId}/model")
-  public ResponseEntity<Model> addModel(@PathVariable Long vehicleBrandId, @RequestBody Model Model) {
-    return modelService.addModel(vehicleBrandId, Model);
+  public ResponseEntity<Model> addModel(@PathVariable Long vehicleBrandId, @RequestBody Model model) {
+    return modelService.addModel(vehicleBrandId, model);
   }
 
   @PutMapping("/Model/{id}")
-  public ResponseEntity<Model> UpdateModel(@PathVariable Long id, @RequestBody Model Model) {
-    return modelService.UpdateModel(Model, id);
+  public ResponseEntity<Model> UpdateModel(@PathVariable Long id, @RequestBody Model model) {
+    return modelService.UpdateModel(model, id);
   }
 
   @DeleteMapping("/Model/{id}")
