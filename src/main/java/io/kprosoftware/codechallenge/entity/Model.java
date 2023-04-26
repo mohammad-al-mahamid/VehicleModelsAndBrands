@@ -36,6 +36,11 @@ public class Model extends BaseEntity<Long> {
     this.vehicleBrand = vehicleBrand;
   }
 
+  public Model(String name, double enginePower) {
+    this.name = name;
+    this.enginePower = enginePower;
+  }
+
   public String getName() {
     return name;
   }
