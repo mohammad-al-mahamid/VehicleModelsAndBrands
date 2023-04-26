@@ -2,6 +2,9 @@ package io.kprosoftware.codechallenge.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import org.slf4j.Logger;
+
 import javax.transaction.Transactional;
 
 import io.kprosoftware.codechallenge.entity.Model;
@@ -15,15 +18,33 @@ public class InitializationTest {
   @Autowired
   private ModelService modelService;
 
+  private Logger logger;
+
+  public InitializationTest(Logger logger) {
+    super();
+    this.logger = logger;
+  }
+
   @Transactional
   public void initDB() {
-    VehicleBrand vehicleBrand = new VehicleBrand("BMW", PriceSegment.Low);
-    vehicleBrandsService.addVehicleBrand(vehicleBrand);
+    if (vehicleBrandsService.countVehicleBrands().getBody().equals(0L)) {
+      logger.info("Database is empty. DB  initialization.");
+      VehicleBrand vehicleBrand = new VehicleBrand();
+      vehicleBrand.setName("BMW");
+      vehicleBrand.setPriceSegment(PriceSegment.Low);
 
-    Model bmwIx = new Model("BMW IX", 326, vehicleBrand);
-    Model bmwXm = new Model("BMW XM", 653, vehicleBrand);
+      vehicleBrandsService.addVehicleBrand(vehicleBrand);
 
-    modelService.addModel(1L, bmwIx);
-    modelService.addModel(1L, bmwXm);
+      Model bmwIx = new Model("BMW IX", 326);
+      Model bmwXm = new Model("BMW XM", 653);
+
+      bmwIx.setVehicleBrand(vehicleBrand);
+      bmwXm.setVehicleBrand(vehicleBrand);
+
+      modelService.addModel(1L, bmwIx);
+      modelService.addModel(1L, bmwXm);
+    } else {
+      logger.info("Database is not empty. Skipping initialization.");
+    }
   }
 }
