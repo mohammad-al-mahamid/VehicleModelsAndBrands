@@ -100,4 +100,8 @@ public class VehicleBrandsService {
     vehicleBrandsRepository.deleteAll();
     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
   }
+
+  public ResponseEntity<Long> countVehicleBrands() {
+    return ResponseEntity.ok(vehicleBrandsRepository.count());
+  }
 }
