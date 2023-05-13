@@ -27,26 +27,26 @@ public class VehicleBrandsService {
     this.logger = logger;
   }
 
-  public ResponseEntity<List<VehicleBrand>> getVehicleBrands() {
+  public List<VehicleBrand> getVehicleBrands() {
     List<VehicleBrand> vehicleBrands = vehicleBrandsRepository.findAll();
     if (vehicleBrands.isEmpty()) {
       logger.info("List is Empty");
-      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+      return vehicleBrands;
     }
     logger.info("Get a list of VehicleBrands ");
-    return new ResponseEntity<>(vehicleBrands, HttpStatus.OK);
+    return vehicleBrands;
   }
 
-  public ResponseEntity<VehicleBrand> getVehicleBrandsById(Long id) {
+  public VehicleBrand getVehicleBrandsById(Long id) {
     VehicleBrand result = vehicleBrandsRepository.findById(id)
 
         .orElseThrow(() -> new VehicleBrandNotFoundException(id));
 
     logger.info("VehicleBrands at " + id + " is " + result);
-    return new ResponseEntity<>(result, HttpStatus.OK);
+    return result;
   }
 
-  public ResponseEntity<VehicleBrand> addVehicleBrand(VehicleBrand vehicleBrand) {
+  public VehicleBrand addVehicleBrand(VehicleBrand vehicleBrand) {
     VehicleBrand newVehicleBrand = new VehicleBrand(vehicleBrand.getName(), vehicleBrand.getPriceSegment());
     vehicleBrandsRepository.saveAndFlush(newVehicleBrand);
 
@@ -61,10 +61,10 @@ public class VehicleBrandsService {
       model = modelRepository.saveAndFlush(model);
       logger.info("Saved Model with id: " + model.getId() + " for VehicleBrand with id: " + newVehicleBrand.getId());
     }
-    return new ResponseEntity<>(newVehicleBrand, HttpStatus.CREATED);
+    return newVehicleBrand;
   }
 
-  public ResponseEntity<VehicleBrand> UpdateVehicleBrand(VehicleBrand newVehicleBrand, Long id) {
+  public VehicleBrand UpdateVehicleBrand(VehicleBrand newVehicleBrand, Long id) {
     return vehicleBrandsRepository.findById(id)
         .map(vehicleBrands -> {
           logger.info("old VehicleBrands: " + vehicleBrandsRepository.findById(id).get());
@@ -73,12 +73,12 @@ public class VehicleBrandsService {
           vehicleBrands.setPriceSegment(newVehicleBrand.getPriceSegment());
 
           logger.info("replace was successful: " + vehicleBrands.toString());
-          return new ResponseEntity<>(vehicleBrandsRepository.save(vehicleBrands), HttpStatus.OK);
+          return vehicleBrandsRepository.save(vehicleBrands);
         })
         .orElseThrow(() -> new VehicleBrandNotFoundException(id));
   }
 
-  public ResponseEntity<HttpStatus> deleteVehicleBrandById(Long id) {
+  public Boolean deleteVehicleBrandById(Long id) {
 
     if (!vehicleBrandsRepository.existsById(id)) {
       logger.warn("vehicleBrand with id" + id + " will be removed from the Database ");
@@ -86,10 +86,10 @@ public class VehicleBrandsService {
     }
 
     vehicleBrandsRepository.deleteById(id);
-    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    return true;
   }
 
-  public ResponseEntity<HttpStatus> deleteALLVehicleBrands() {
+  public Boolean deleteALLVehicleBrands() {
     List<VehicleBrand> result = vehicleBrandsRepository.findAll();
 
     if (result.isEmpty()) {
@@ -98,7 +98,7 @@ public class VehicleBrandsService {
 
     logger.warn("Delete all VehicleBrands!!! ");
     vehicleBrandsRepository.deleteAll();
-    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    return true;
   }
 
   public ResponseEntity<Long> countVehicleBrands() {

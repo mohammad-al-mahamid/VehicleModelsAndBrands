@@ -23,33 +23,49 @@ public class VehicleBrandController {
 
   @GetMapping("/VehicleBrands")
   public ResponseEntity<List<VehicleBrand>> getVehicleBrands() {
-    return vehicleBrandsService.getVehicleBrands();
+    List<VehicleBrand> vehicleBrands = vehicleBrandsService.getVehicleBrands();
+
+    if (vehicleBrands.isEmpty()) {
+      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+    return new ResponseEntity<>(vehicleBrands, HttpStatus.OK);
+
   }
 
   @GetMapping("/VehicleBrands{id}")
   public ResponseEntity<VehicleBrand> getVehicleBrandById(@PathVariable Long id) {
-    return vehicleBrandsService.getVehicleBrandsById(id);
+    VehicleBrand vehicleBrand = vehicleBrandsService.getVehicleBrandsById(id);
+    return new ResponseEntity<>(vehicleBrand, HttpStatus.OK);
+
   }
 
   @PostMapping("/VehicleBrand")
   public ResponseEntity<VehicleBrand> addVehicleBrand(@RequestBody VehicleBrand vehicleBrand) {
-    return vehicleBrandsService.addVehicleBrand(vehicleBrand);
+    VehicleBrand newVehicleBrand = vehicleBrandsService.addVehicleBrand(vehicleBrand);
+    return new ResponseEntity<>(newVehicleBrand, HttpStatus.CREATED);
+
   }
 
   @PutMapping("/VehicleBrand/{id}")
   public ResponseEntity<VehicleBrand> UpdateVehicleBrand(@PathVariable Long id,
       @RequestBody VehicleBrand vehicleBrand) {
-    return vehicleBrandsService.UpdateVehicleBrand(vehicleBrand, id);
+    VehicleBrand updatedVehicleBrand = vehicleBrandsService.UpdateVehicleBrand(vehicleBrand, id);
+    return new ResponseEntity<>(updatedVehicleBrand, HttpStatus.OK);
+
   }
 
   @DeleteMapping("/VehicleBrand/{id}")
   public ResponseEntity<HttpStatus> deleteVehicleBrandById(@PathVariable Long id) {
-    return vehicleBrandsService.deleteVehicleBrandById(id);
+    vehicleBrandsService.deleteVehicleBrandById(id);
+    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+
   }
 
   @DeleteMapping("/VehicleBrands")
   public ResponseEntity<HttpStatus> deleteVehicleBrands() {
-    return vehicleBrandsService.deleteALLVehicleBrands();
+    vehicleBrandsService.deleteALLVehicleBrands();
+    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+
   }
 
 }
